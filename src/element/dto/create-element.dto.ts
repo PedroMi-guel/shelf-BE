@@ -12,5 +12,5 @@ export class CreateElementDto {
 
     @IsNumber()
     @IsPositive()
-    category_id:Category
+    category:Category
 }

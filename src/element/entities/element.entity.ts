@@ -12,5 +12,5 @@ export class Element {
     @Column()
     image?: string;
     @ManyToOne(() => Category, category => category.elements)
-    category_id: Category;
+    category: Category;
 }

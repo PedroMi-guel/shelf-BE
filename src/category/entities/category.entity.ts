@@ -12,6 +12,6 @@ export class Category {
     description: string;
     @Column()
     image?: string;
-    @OneToMany(() => Element, element => element.category_id)
+    @OneToMany(() => Element, element => element.category)
     elements: Element[];
 }

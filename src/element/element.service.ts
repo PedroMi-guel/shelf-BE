@@ -22,7 +22,7 @@ export class ElementService {
 
   async findAll() {
     try {
-      const elements =  await this.elementRepository.find();
+      const elements =  await this.elementRepository.find({relations:['category']});
       return elements;
     } catch (error) {
       throw new InternalServerErrorException(error);
