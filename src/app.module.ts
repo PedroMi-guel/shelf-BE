@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryModule } from './category/category.module';
 import { ElementModule } from './element/element.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -15,8 +17,7 @@ import { ElementModule } from './element/element.module';
     database: 'shelf',
     autoLoadEntities: true,
     synchronize: true,}),
-    CategoryModule, 
-    ElementModule],
+    CategoryModule, ElementModule, CloudinaryModule, ConfigModule.forRoot({ isGlobal: true})],
   controllers: [AppController],
   providers: [AppService],
 })
