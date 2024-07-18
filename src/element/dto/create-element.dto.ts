@@ -1,3 +1,4 @@
+import { Type } from "class-transformer";
 import { IsNumber, IsPositive, IsString, MinLength } from "class-validator";
 import { Category } from "src/category/entities/category.entity";
 
@@ -12,5 +13,6 @@ export class CreateElementDto {
 
     @IsNumber()
     @IsPositive()
+    @Type(() => Number )
     category:Category
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, NotFoundException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Response } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, NotFoundException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Response, HttpCode } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -13,9 +13,26 @@ export class CategoryController {
     {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(201)
+  create(@Body() createCategoryDto: CreateCategoryDto, @Body('folder') folder: string, @UploadedFile(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4MB max size
+        new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }), // Allow PNG, JPEG, JPG
+      ],
+    }),
+  ) file: Express.Multer.File){
+  if (!folder) {
+    throw new BadRequestException('Folder not specified')
+  } 
+    return this.categoryService.create(createCategoryDto, file, folder);
+  }
+
+/*@Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
-  }
+  }*/
 
   @Get()
   findAll() {
@@ -37,7 +54,7 @@ export class CategoryController {
     return this.categoryService.remove(+id);
   }
 
-  @Post('upload')
+  /* @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
     @UploadedFile(
@@ -61,5 +78,5 @@ export class CategoryController {
       console.error(error);
       throw new NotFoundException('Error uploading file');
     }
-  }
+  } */
 }

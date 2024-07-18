@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, NotFoundException, BadRequestException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, NotFoundException, BadRequestException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, HttpCode } from '@nestjs/common';
 import { ElementService } from './element.service';
 import { CreateElementDto } from './dto/create-element.dto';
 import { UpdateElementDto } from './dto/update-element.dto';
@@ -12,9 +12,25 @@ export class ElementController {
     private readonly CloudinaryService: CloudinaryService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(201)
+  create(@Body() createElementDto: CreateElementDto, @Body('folder') folder: string, @UploadedFile(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4MB max size
+        new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }), // Allow PNG, JPEG, JPG
+      ],
+    }),
+  ) file: Express.Multer.File){
+  if (!folder) {
+    throw new BadRequestException('Folder not specified')
+  } 
+    return this.elementService.create(createElementDto, file, folder);
+}
+  /*@Post()
   create(@Body() createElementDto: CreateElementDto) {
     return this.elementService.create(createElementDto);
-  }
+  }*/
 
   @Get()
   findAll() {
@@ -36,7 +52,7 @@ export class ElementController {
     return this.elementService.remove(+id);
   }
 
-  @Post('upload')
+  /*@Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
     @UploadedFile(
@@ -60,5 +76,5 @@ export class ElementController {
       console.error(error);
       throw new NotFoundException('Error uploading file');
     }
-  }
+  }*/
 }
