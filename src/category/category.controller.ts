@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, NotFoundException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, NotFoundException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Response } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -37,17 +37,44 @@ export class CategoryController {
     return this.categoryService.remove(+id);
   }
 
+  // @Post('upload')
+  // @UseInterceptors(FileInterceptor('file'))
+  // uploadImage(
+  //   @UploadedFile(
+  //     new ParseFilePipe({
+  //       validators:[
+  //         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4}),
+  //         new FileTypeValidator({fileType: '.(png|jpeg|jpg)' }),
+  //       ]
+  //     }),
+  //   ) 
+  //   file: Express.Multer.File){
+  //     return this.CloudinaryService.uploadFile(file);
+  //   }
+
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  uploadImage(
+  async uploadImage(
     @UploadedFile(
       new ParseFilePipe({
-        validators:[
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4}),
-          new FileTypeValidator({fileType: '.(png|jpeg|jpg)' }),
-        ]
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4MB max size
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }), // Allow PNG, JPEG, JPG
+        ],
       }),
-    ) file: Express.Multer.File){
-      return this.CloudinaryService.uploadFile(file);
+    )
+    file: Express.Multer.File,
+    @Body('folder') folder: string
+  ){
+    if (!folder) {
+      throw new BadRequestException('Folder not specified')
     }
+    try {
+      const result = await this.CloudinaryService.uploadFile(file, folder);
+      return {message: 'File uploaded successfully'}
+    } catch (error) {
+      console.error(error);
+      throw new NotFoundException('Error uploading file');
+    }
+  }
 }

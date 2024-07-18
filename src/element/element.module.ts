@@ -3,10 +3,11 @@ import { ElementService } from './element.service';
 import { ElementController } from './element.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Element } from './entities/element.entity';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Module({
   controllers: [ElementController],
-  providers: [ElementService],
+  providers: [ElementService, CloudinaryService],
   imports: [TypeOrmModule.forFeature([Element])],
 })
 export class ElementModule {}
