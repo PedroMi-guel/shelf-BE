@@ -37,21 +37,6 @@ export class CategoryController {
     return this.categoryService.remove(+id);
   }
 
-  // @Post('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // uploadImage(
-  //   @UploadedFile(
-  //     new ParseFilePipe({
-  //       validators:[
-  //         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4}),
-  //         new FileTypeValidator({fileType: '.(png|jpeg|jpg)' }),
-  //       ]
-  //     }),
-  //   ) 
-  //   file: Express.Multer.File){
-  //     return this.CloudinaryService.uploadFile(file);
-  //   }
-
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
@@ -71,7 +56,7 @@ export class CategoryController {
     }
     try {
       const result = await this.CloudinaryService.uploadFile(file, folder);
-      return {message: 'File uploaded successfully'}
+      return {result, message: 'File uploaded successfully'}
     } catch (error) {
       console.error(error);
       throw new NotFoundException('Error uploading file');

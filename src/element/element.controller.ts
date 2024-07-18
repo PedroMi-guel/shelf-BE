@@ -7,7 +7,9 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Controller('element')
 export class ElementController {
-  constructor(private readonly elementService: ElementService) {}
+  constructor(
+    private readonly elementService: ElementService,
+    private readonly CloudinaryService: CloudinaryService) {}
 
   @Post()
   create(@Body() createElementDto: CreateElementDto) {
@@ -34,29 +36,29 @@ export class ElementController {
     return this.elementService.remove(+id);
   }
 
-  // @Post('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // async uploadImage(
-  //   @UploadedFile(
-  //     new ParseFilePipe({
-  //       validators: [
-  //         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4MB max size
-  //         new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }), // Allow PNG, JPEG, JPG
-  //       ],
-  //     }),
-  //   )
-  //   file: Express.Multer.File,
-  //   @Body('folder') folder: string
-  // ){
-  //   if (!folder) {
-  //     throw new BadRequestException('Folder not specified')
-  //   }
-  //   try {
-  //     const result = await this.CloudinaryService.uploadFile(file, folder);
-  //     return {message: 'File uploaded successfully'}
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new NotFoundException('Error uploading file');
-  //   }
-  // }
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4MB max size
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }), // Allow PNG, JPEG, JPG
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body('folder') folder: string
+  ){
+    if (!folder) {
+      throw new BadRequestException('Folder not specified')
+    }
+    try {
+      const result = await this.CloudinaryService.uploadFile(file, folder);
+      return {result, message: 'File uploaded successfully'}
+    } catch (error) {
+      console.error(error);
+      throw new NotFoundException('Error uploading file');
+    }
+  }
 }
