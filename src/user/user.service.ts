@@ -85,5 +85,23 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
+
+    
+  }
+  
+  async findByEmail(email: string){
+    try{
+
+      const user = await this.userRepo.findOne({ where: { email } })
+
+      if (!user){
+        throw new NotFoundException('Usuario no encontrado');   
+      }
+
+      return user
+
+    } catch(error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }
