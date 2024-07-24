@@ -3,7 +3,7 @@ import { CreateElementDto } from './dto/create-element.dto';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Element } from './entities/element.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
@@ -77,5 +77,10 @@ export class ElementService {
       await this.elementRepository.delete(id);
       return `Element with id ${id} has been deleted.`;
     } 
+  }
+
+  async busqueda(termino:string){
+    const buscados = await this.elementRepository.find({where:{name:Like(`%${termino}%`)}});
+    return buscados;
   }
 }

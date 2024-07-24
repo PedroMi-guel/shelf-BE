@@ -3,7 +3,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
@@ -79,5 +79,10 @@ export class CategoryService {
       await this.categoryRepository.delete(id);
       return `Element with id ${id} has been deleted.`;
     }
+  }
+
+  async busqueda(termino:string){
+    const buscados = await this.categoryRepository.find({where:{name:Like(`%${termino}%`)}});
+    return buscados;
   }
 }

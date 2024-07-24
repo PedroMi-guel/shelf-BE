@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, NotFoundException, BadRequestException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, NotFoundException, BadRequestException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, HttpCode, Query } from '@nestjs/common';
 import { ElementService } from './element.service';
 import { CreateElementDto } from './dto/create-element.dto';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
-@Controller('element')
+@Controller('elements')
 export class ElementController {
   constructor(
     private readonly elementService: ElementService,
@@ -35,6 +35,11 @@ export class ElementController {
   @Get()
   findAll() {
     return this.elementService.findAll();
+  }
+
+  @Get('/search')
+  search(@Query('termino')termino:string){
+    return this.elementService.busqueda(termino);
   }
 
   @Get(':id')

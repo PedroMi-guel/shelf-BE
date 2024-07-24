@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, NotFoundException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Response, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, NotFoundException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Response, HttpCode, Query } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
-@Controller('category')
+@Controller('categories')
 export class CategoryController {
   constructor(
     private readonly categoryService: CategoryService,
@@ -37,6 +37,11 @@ export class CategoryController {
   @Get()
   findAll() {
     return this.categoryService.findAll();
+  }
+
+  @Get('/search')
+  search(@Query('termino')termino:string){
+    return this.categoryService.busqueda(termino);
   }
 
   @Get(':id')
