@@ -1,20 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, NotFoundException, BadRequestException, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, HttpCode, Query } from '@nestjs/common';
 import { ElementService } from './element.service';
 import { CreateElementDto } from './dto/create-element.dto';
 import { UpdateElementDto } from './dto/update-element.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
-@Controller('element')
+@Controller('elements')
 export class ElementController {
-  constructor(private readonly elementService: ElementService) {}
+  constructor(
+    private readonly elementService: ElementService,
+    private readonly CloudinaryService: CloudinaryService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(201)
+  create(@Body() createElementDto: CreateElementDto, @Body('folder') folder: string, @UploadedFile(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4MB max size
+        new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }), // Allow PNG, JPEG, JPG
+      ],
+    }),
+  ) file: Express.Multer.File){
+  if (!folder) {
+    throw new BadRequestException('Folder not specified')
+  } 
+    return this.elementService.create(createElementDto, file, folder);
+}
+  /*@Post()
   create(@Body() createElementDto: CreateElementDto) {
     return this.elementService.create(createElementDto);
-  }
+  }*/
 
   @Get()
   findAll() {
     return this.elementService.findAll();
+  }
+
+  @Get('/search')
+  search(@Query('termino')termino:string){
+    return this.elementService.busqueda(termino);
   }
 
   @Get(':id')
@@ -31,4 +56,30 @@ export class ElementController {
   remove(@Param('id') id: string) {
     return this.elementService.remove(+id);
   }
+
+  /*@Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4MB max size
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }), // Allow PNG, JPEG, JPG
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body('folder') folder: string
+  ){
+    if (!folder) {
+      throw new BadRequestException('Folder not specified')
+    }
+    try {
+      const result = await this.CloudinaryService.uploadFile(file, folder);
+      return {result, message: 'File uploaded successfully'}
+    } catch (error) {
+      console.error(error);
+      throw new NotFoundException('Error uploading file');
+    }
+  }*/
 }

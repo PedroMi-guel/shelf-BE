@@ -3,14 +3,29 @@ import { CreateElementDto } from './dto/create-element.dto';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Element } from './entities/element.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class ElementService {
   constructor(@InjectRepository(Element)
-  private elementRepository: Repository<Element>) { }
+  private elementRepository: Repository<Element>,
+  private CloudinaryService: CloudinaryService) { }
 
-  async create(createElementDto: CreateElementDto) {
+  async create(createElementDto: CreateElementDto, file: Express.Multer.File, folder:string) {
+    try{
+      const uploadImage = await this.CloudinaryService.uploadFile(file, folder);
+      const imageUrl = uploadImage.url;
+      const element = this.elementRepository.create({ ...createElementDto, image: imageUrl});
+      await this.elementRepository.save(element);
+      return element;
+    }
+    catch(error){
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  /*async create(createElementDto: CreateElementDto) {
     try {
       const element = this.elementRepository.create(createElementDto);
       await this.elementRepository.save(element);
@@ -18,7 +33,7 @@ export class ElementService {
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
-  }
+  }*/
 
   async findAll() {
     try {
@@ -62,5 +77,10 @@ export class ElementService {
       await this.elementRepository.delete(id);
       return `Element with id ${id} has been deleted.`;
     } 
+  }
+
+  async busqueda(termino:string){
+    const buscados = await this.elementRepository.find({where:{name:Like(`%${termino}%`)}});
+    return buscados;
   }
 }
