@@ -15,7 +15,7 @@ export class User {
     @Column()
     lastName:string;
 
-    @Column('text', {select: false})
+    @Column('text')
     password:string;
     
     @CreateDateColumn({
