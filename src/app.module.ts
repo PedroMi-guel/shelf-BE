@@ -2,10 +2,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CategoryModule } from './category/category.module';
-import { ElementModule } from './element/element.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { ConfigModule } from '@nestjs/config';
+
+import { RecordModule } from './record/record.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { CategoryModule } from './category/category.module';
+import { ElementModule } from './element/element.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -17,7 +21,7 @@ import { ConfigModule } from '@nestjs/config';
     database: 'shelf',
     autoLoadEntities: true,
     synchronize: true,}),
-    CategoryModule, ElementModule, CloudinaryModule, ConfigModule.forRoot({ isGlobal: true})],
+    CategoryModule, ElementModule, CloudinaryModule, ConfigModule.forRoot({ isGlobal: true})], , AuthModule,
   controllers: [AppController],
   providers: [AppService],
 })
