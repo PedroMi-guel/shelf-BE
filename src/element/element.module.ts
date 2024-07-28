@@ -9,5 +9,6 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
   controllers: [ElementController],
   providers: [ElementService, CloudinaryService],
   imports: [TypeOrmModule.forFeature([Element])],
+  exports: [ElementService]
 })
 export class ElementModule {}

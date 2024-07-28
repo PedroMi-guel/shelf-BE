@@ -4,16 +4,24 @@ import { UpdateRecordDto } from './dto/update-record.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Record } from './entities/record.entity';
-import { Element } from 'src/element/entities/element.entity';
+import { ElementService } from 'src/element/element.service';
 
 @Injectable()
 export class RecordService {
-  constructor(@InjectRepository(Record) private recordsRepo: Repository<Record>){}
+  constructor(@InjectRepository(Record) private recordsRepo: Repository<Record>, private elementsService:ElementService){}
 
   async create(createRecordDto: CreateRecordDto) {
-    
     try {
-      const record = await this.recordsRepo.create(createRecordDto);
+
+      const elements = await this.elementsService.findByIds(createRecordDto.elements);
+
+      const record = await this.recordsRepo.create({
+        ...createRecordDto, 
+        end_time: new Date(createRecordDto.end), 
+        start_time: new Date(createRecordDto.start),
+        elements: elements
+      });
+
       await this.recordsRepo.save(record);
 
       return record;
@@ -25,7 +33,7 @@ export class RecordService {
 
   async findAll() {
     try {
-      const records = await this.recordsRepo.find({relations: {element: true}});
+      const records = await this.recordsRepo.find({relations: {elements: true}});
       return records;
 
     } catch (error) {
@@ -35,7 +43,7 @@ export class RecordService {
 
   async findOne(id: number) {
     try {
-      const record = await this.recordsRepo.findOne({where: {id}, relations: {element: true}});
+      const record = await this.recordsRepo.findOne({where: {id}, relations: {elements: true}});
 
       if(!record){
         throw new NotFoundException('elemento no encontrado');      
@@ -50,9 +58,14 @@ export class RecordService {
 
   async update(id: number, updateRecordDto: UpdateRecordDto) {
     try {
+
+      const elements = await this.elementsService.findByIds(updateRecordDto.elements);
+
+
       const record = await this.recordsRepo.preload({
         id,
-        ...updateRecordDto});
+        ...updateRecordDto,
+        elements: elements});
 
       if(!record){
         throw new NotFoundException('Elemento no encontrado');
@@ -87,7 +100,7 @@ export class RecordService {
   async getByElement(id: number){
 
     try {
-      const records = await this.recordsRepo.find({where: { element: { id } }});
+      const records = await this.recordsRepo.find({where: { elements: { id } }});
       return records;
 
     } catch (error) {

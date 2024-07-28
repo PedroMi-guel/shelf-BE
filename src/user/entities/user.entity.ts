@@ -1,5 +1,6 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { hashSync } from 'bcrypt';
+import { Record } from "src/record/entities/record.entity";
 
 @Entity()
 export class User {
@@ -23,6 +24,9 @@ export class User {
         default: () => 'CURRENT_TIMESTAMP'
     })
     created_at:Date;
+
+    @OneToMany(() => Record, record => record.user)
+    records:Record[];
 
     @BeforeInsert()
     checkEmail(){

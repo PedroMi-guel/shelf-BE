@@ -1,5 +1,6 @@
 import { Category } from "src/category/entities/category.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Record } from "src/record/entities/record.entity";
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Element {
@@ -13,4 +14,6 @@ export class Element {
     image?: string;
     @ManyToOne(() => Category, category => category.elements)
     category: Category;
+    @ManyToMany(() => Record, record => record.elements)
+    records:Record[];
 }

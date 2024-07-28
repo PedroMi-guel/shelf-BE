@@ -1,6 +1,6 @@
 import { Element } from "src/element/entities/element.entity";
 import { User } from "src/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Record {
@@ -22,12 +22,11 @@ export class Record {
     })
     created_at:Date;
 
-    @OneToOne(() => Element)
-    @JoinColumn()
-    element:Element;
+    @ManyToMany(() => Element, element => element.records)
+    @JoinTable()
+    elements:Element[];
 
-    @OneToOne(() => User)
+    @ManyToOne(() => User, user => user.records)
     @JoinColumn()
-    user:User
-
+    user:User;
 }

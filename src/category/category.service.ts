@@ -18,6 +18,7 @@ export class CategoryService {
       const imageUrl = uploadImage.url;
       const category = this.categoryRepository.create({ ...createCategoryDto, image: imageUrl});
       await this.categoryRepository.save(category);
+    
       return category;
     }
     catch(error){

@@ -3,7 +3,7 @@ import { CreateElementDto } from './dto/create-element.dto';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Element } from './entities/element.entity';
-import { Like, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
@@ -52,6 +52,12 @@ export class ElementService {
       throw new InternalServerErrorException(`Element with id ${id} not found.`);
     }
     return element;
+  }
+
+  async findByIds(ids: number[] ){
+    const elements:Element[] = await this.elementRepository.findBy({id: In(ids)})
+
+    return elements
   }
 
   async update(id: number, updateElementDto: UpdateElementDto) {

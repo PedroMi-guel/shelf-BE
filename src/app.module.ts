@@ -21,7 +21,7 @@ import { ElementModule } from './element/element.module';
     database: 'shelf',
     autoLoadEntities: true,
     synchronize: true,}),
-    CategoryModule, ElementModule, CloudinaryModule, ConfigModule.forRoot({ isGlobal: true})], , AuthModule,
+    CategoryModule, ElementModule, RecordModule, AuthModule, UserModule,CloudinaryModule, ConfigModule.forRoot({ isGlobal: true })],
   controllers: [AppController],
   providers: [AppService],
 })
