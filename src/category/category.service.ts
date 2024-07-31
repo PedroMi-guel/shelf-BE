@@ -38,7 +38,7 @@ export class CategoryService {
 
   async findAll() {
     try {
-      const categories = await this.categoryRepository.find();
+      const categories = await this.categoryRepository.find({relations: {elements: true}});
       return categories;
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -47,7 +47,8 @@ export class CategoryService {
 
   findOne(id: number) {
     const category = this.categoryRepository.findOne({
-      where: { id }
+      where: { id },
+      relations: {elements: true}
     });
     if (!category){
       throw new NotFoundException(`Element with id ${id} not found.`); 
@@ -83,7 +84,10 @@ export class CategoryService {
   }
 
   async busqueda(termino:string){
-    const buscados = await this.categoryRepository.find({where:{name:Like(`%${termino}%`)}});
+    const buscados = await this.categoryRepository.find({
+      where:{name:Like(`%${termino}%`)},
+      relations: {elements: true}});
+      
     return buscados;
   }
 }

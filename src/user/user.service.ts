@@ -53,6 +53,7 @@ export class UserService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try{
+
       const user = await this.userRepo.preload({
         id,
         ...updateUserDto});
@@ -92,7 +93,11 @@ export class UserService {
   async findByEmail(email: string){
     try{
 
-      const user = await this.userRepo.findOne({ where: { email } })
+      const user = await this.userRepo.createQueryBuilder('user')
+      .select([ 'user.password', 'user.id', 'user.name', 'user.lastName', 'user.email' ])
+      .where('user.email = :email')
+      .setParameter('email', email)
+      .getOne();
 
       if (!user){
         throw new NotFoundException('Usuario no encontrado');   

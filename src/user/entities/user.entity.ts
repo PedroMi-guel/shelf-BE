@@ -1,4 +1,4 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { hashSync } from 'bcrypt';
 import { Record } from "src/record/entities/record.entity";
 
@@ -16,7 +16,7 @@ export class User {
     @Column()
     lastName:string;
 
-    @Column('text')
+    @Column({select: false})
     password:string;
     
     @CreateDateColumn({
@@ -32,6 +32,11 @@ export class User {
     checkEmail(){
         this.email = this.email.toLowerCase().trim();
 
+        this.password = hashSync(this.password.trim(), 10);
+    }
+
+    @BeforeUpdate()
+    cryptPassword(){
         this.password = hashSync(this.password.trim(), 10);
     }
 }

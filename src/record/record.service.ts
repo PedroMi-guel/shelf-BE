@@ -2,9 +2,10 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Record } from './entities/record.entity';
 import { ElementService } from 'src/element/element.service';
+import { Element } from 'src/element/entities/element.entity';
 
 @Injectable()
 export class RecordService {
@@ -33,7 +34,7 @@ export class RecordService {
 
   async findAll() {
     try {
-      const records = await this.recordsRepo.find({relations: {elements: true}});
+      const records = await this.recordsRepo.find({relations: {elements: true, user: true}});
       return records;
 
     } catch (error) {
@@ -43,7 +44,7 @@ export class RecordService {
 
   async findOne(id: number) {
     try {
-      const record = await this.recordsRepo.findOne({where: {id}, relations: {elements: true}});
+      const record = await this.recordsRepo.findOne({where: {id}, relations: {elements: true, user: true}});
 
       if(!record){
         throw new NotFoundException('elemento no encontrado');      
@@ -100,7 +101,17 @@ export class RecordService {
   async getByElement(id: number){
 
     try {
-      const records = await this.recordsRepo.find({where: { elements: { id } }});
+      let ids:number[] = [];
+
+      const element = await this.elementsService.findOne(id);
+      let records = await this.recordsRepo.find({where: { elements: element }});
+
+      records.forEach(element => {
+        ids.push(element.id);
+      });
+
+      records = await this.recordsRepo.find({where: {id: In(ids)}, relations: {elements: true, user: true}});
+
       return records;
 
     } catch (error) {

@@ -32,7 +32,7 @@ export class RecordController {
     return this.recordService.remove(+id);
   }
 
-  @Get('getByUser/:id')
+  @Get('getByElement/:id')
   getByElement(@Param('id') id: string){
     return this.recordService.getByElement(+id)
   }
