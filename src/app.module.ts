@@ -12,7 +12,8 @@ import { CategoryModule } from './category/category.module';
 import { ElementModule } from './element/element.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
+  imports: [
+    TypeOrmModule.forRoot({
     type: 'mysql',
     host: 'localhost',
     port: 3306,

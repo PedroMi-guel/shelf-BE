@@ -25,7 +25,7 @@ export class RecordService {
 
   async findAll() {
     try {
-      const records = await this.recordsRepo.find({relations: {element: true}});
+      const records = await this.recordsRepo.find({relations: {element: true, user: true}});
       return records;
 
     } catch (error) {
@@ -35,7 +35,7 @@ export class RecordService {
 
   async findOne(id: number) {
     try {
-      const record = await this.recordsRepo.findOne({where: {id}, relations: {element: true}});
+      const record = await this.recordsRepo.findOne({where: {id}, relations: {element: true, user: true}});
 
       if(!record){
         throw new NotFoundException('elemento no encontrado');      
